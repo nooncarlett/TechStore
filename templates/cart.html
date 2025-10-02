@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Shopping Cart - TechStore Pro{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">Shopping Cart</h1>
+        </div>
+    </div>
+    
+    {% if products %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    {% for item in products %}
+                    <div class="row align-items-center border-bottom py-3">
+                        <div class="col-md-2">
+                            <img src="{{ item.product.image_url or 'https://m.media-amazon.com/images/I/71Q4+8VqHVL._AC_UY695_.jpg' }}" class="img-fluid rounded cart-item-image" alt="{{ item.product.name }}">
+                        </div>
+                        <div class="col-md-4">
+                            <h5 class="mb-1">{{ item.product.name }}</h5>
+                            <p class="text-muted mb-0">{{ item.product.description[:100] }}...</p>
+                        </div>
+                        <div class="col-md-2">
+                            <span class="h6">${{ "%.2f"|format(item.product.price) }}</span>
+                        </div>
+                        <div class="col-md-2">
+                            <span class="badge bg-secondary">{{ item.quantity }}</span>
+                        </div>
+                        <div class="col-md-2">
+                            <span class="h6 text-primary">${{ "%.2f"|format(item.product.price * item.quantity) }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Order Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal:</span>
+                        <span>${{ "%.2f"|format(total) }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Shipping:</span>
+                        <span class="text-success">FREE</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between">
+                        <strong>Total:</strong>
+                        <strong class="text-primary">${{ "%.2f"|format(total) }}</strong>
+                    </div>
+                    
+                    <div class="d-grid mt-3">
+                        <a href="{{ url_for('checkout') }}" class="btn btn-primary btn-lg">Proceed to Checkout</a>
+                    </div>
+                    
+                    <div class="text-center mt-3">
+                        <a href="{{ url_for('products') }}" class="text-muted">Continue Shopping</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="row">
+        <div class="col-12">
+            <div class="text-center py-5">
+                <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+                <h3>Your cart is empty</h3>
+                <p class="text-muted">Add some products to get started!</p>
+                <a href="{{ url_for('products') }}" class="btn btn-primary btn-lg">Start Shopping</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+

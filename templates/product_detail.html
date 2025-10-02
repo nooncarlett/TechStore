@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }} - TechStore Pro{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-6">
+            <img src="{{ product.image_url or 'https://m.media-amazon.com/images/I/71Q4+8VqHVL._AC_UY695_.jpg' }}" class="img-fluid rounded shadow product-detail-image" alt="{{ product.name }}">
+        </div>
+        <div class="col-md-6">
+            <h1 class="mb-3">{{ product.name }}</h1>
+            <p class="text-muted mb-3">{{ product.description }}</p>
+            
+            <div class="mb-3">
+                <span class="h3 text-primary">${{ "%.2f"|format(product.price) }}</span>
+                <span class="badge bg-success ms-2">In Stock: {{ product.stock_quantity }}</span>
+            </div>
+            
+            <div class="mb-4">
+                <label for="quantity-{{ product.id }}" class="form-label">Quantity:</label>
+                <input type="number" id="quantity-{{ product.id }}" class="form-control" value="1" min="1" max="{{ product.stock_quantity }}" style="width: 100px;">
+            </div>
+            
+            {% if session.user_id %}
+                <button onclick="addToCart({{ product.id }})" class="btn btn-primary btn-lg me-2">Add to Cart</button>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg me-2">Login to Purchase</a>
+            {% endif %}
+            
+            <a href="{{ url_for('products') }}" class="btn btn-outline-secondary btn-lg">Back to Products</a>
+        </div>
+    </div>
+    
+    <!-- Product Reviews -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <h3>Customer Reviews</h3>
+            
+            {% if session.user_id %}
+            <!-- Add Review Form -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5>Write a Review</h5>
+                    <form onsubmit="addReview({{ product.id }}); return false;">
+                        <div class="mb-3">
+                            <label for="rating-{{ product.id }}" class="form-label">Rating:</label>
+                            <select id="rating-{{ product.id }}" class="form-select" required>
+                                <option value="">Select Rating</option>
+                                <option value="5">5 Stars - Excellent</option>
+                                <option value="4">4 Stars - Very Good</option>
+                                <option value="3">3 Stars - Good</option>
+                                <option value="2">2 Stars - Fair</option>
+                                <option value="1">1 Star - Poor</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="comment-{{ product.id }}" class="form-label">Comment:</label>
+                            <textarea id="comment-{{ product.id }}" class="form-control" rows="3" placeholder="Share your experience with this product..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit Review</button>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Reviews List -->
+            {% if reviews %}
+                {% for review in reviews %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <h6 class="mb-1">{{ review.user.username }}</h6>
+                                <div class="text-warning">
+                                    {% for i in range(review.rating) %}
+                                        <i class="fas fa-star"></i>
+                                    {% endfor %}
+                                    {% for i in range(5 - review.rating) %}
+                                        <i class="far fa-star"></i>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <small class="text-muted">{{ review.created_at.strftime('%B %d, %Y') }}</small>
+                        </div>
+                        <p class="mb-0">{{ review.comment|safe }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+                    <h5>No reviews yet</h5>
+                    <p class="text-muted">Be the first to review this product!</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
